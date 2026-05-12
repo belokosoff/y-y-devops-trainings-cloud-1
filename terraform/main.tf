@@ -26,7 +26,7 @@ resource "yandex_container_registry" "registry1" {
 }
 
 locals {
-  folder_id = "<INSERT YOUR FOLDER ID>"
+  folder_id = TF_VAR_FOLDER_ID
   service-accounts = toset([
     "catgpt-sa",
   ])

@@ -1,0 +1,44 @@
+#
+name: Create and publish a Docker image
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+env:
+  REGISTRY: cr.yandex
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+      #
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to YandexCloudRegistry
+        run: |
+          printf '%s' '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
+          docker login \
+            --username json_key \
+            --password-stdin cr.yandex < key.json
+      - name: Build Image
+        run: |
+          docker build -t catgpt .
+      - name: Tag Image
+        run: |
+          docker tag catgpt cr.yandex/${{ secrets.YC_REGISTRY_ID }}/catgpt:latest
+      - name: Push Image
+        run: |
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/catgpt:latest
