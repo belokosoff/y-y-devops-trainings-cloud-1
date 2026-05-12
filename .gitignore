@@ -23,5 +23,6 @@ go.work
 # Terraform Secrets
 *.json
 .terraform*
-
 .env
+*.tfstate
+*.tfvars
